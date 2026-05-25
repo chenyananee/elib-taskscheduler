@@ -39,10 +39,10 @@ elib_ts_err_t elib_ts_init(elib_ts_ctx_t *ctx,
 
     ctx->tasks = tasks;
     ctx->max_tasks = max_tasks;
-    ctx->running = false;
+    ctx->bit_flags.running = 0;
     ctx->enter_critical = enter_critical;
     ctx->exit_critical = exit_critical;
-    ctx->initialized = 1;
+    ctx->bit_flags.initialized = 1;
 
     return ELIB_TS_OK;
 }
@@ -52,7 +52,7 @@ void elib_ts_deinit(elib_ts_ctx_t *ctx) {
     if (ctx == NULL) {
         return;
     }
-    ctx->initialized = 0;
+    ctx->bit_flags.initialized = 0;
 }
 
 /* Start scheduler */
@@ -60,14 +60,14 @@ elib_ts_err_t elib_ts_start(elib_ts_ctx_t *ctx) {
     if (ctx == NULL) {
         return ELIB_TS_ERR_INVALID_PARAM;
     }
-    if (!ctx->initialized) {
+    if (!ctx->bit_flags.initialized) {
         return ELIB_TS_ERR_NOT_INITIALIZED;
     }
-    if (ctx->running) {
+    if (ctx->bit_flags.running) {
         return ELIB_TS_ERR_ALREADY_RUNNING;
     }
 
-    ctx->running = true;
+    ctx->bit_flags.running = 1;
     return ELIB_TS_OK;
 }
 
@@ -76,20 +76,20 @@ elib_ts_err_t elib_ts_stop(elib_ts_ctx_t *ctx) {
     if (ctx == NULL) {
         return ELIB_TS_ERR_INVALID_PARAM;
     }
-    if (!ctx->initialized) {
+    if (!ctx->bit_flags.initialized) {
         return ELIB_TS_ERR_NOT_INITIALIZED;
     }
-    if (!ctx->running) {
+    if (!ctx->bit_flags.running) {
         return ELIB_TS_ERR_NOT_RUNNING;
     }
 
-    ctx->running = false;
+    ctx->bit_flags.running = 0;
     return ELIB_TS_OK;
 }
 
 /* Tick update - call from ISR */
 void elib_ts_tick_update(elib_ts_ctx_t *ctx, uint32_t ms) {
-    if (ctx == NULL || !ctx->initialized || ms == 0) {
+    if (ctx == NULL || !ctx->bit_flags.initialized || ms == 0) {
         return;
     }
 
@@ -117,7 +117,7 @@ elib_ts_err_t elib_ts_register(elib_ts_ctx_t *ctx,
     if (ctx == NULL || exec_cb == NULL || out_task_id == NULL) {
         return ELIB_TS_ERR_INVALID_PARAM;
     }
-    if (!ctx->initialized) {
+    if (!ctx->bit_flags.initialized) {
         return ELIB_TS_ERR_NOT_INITIALIZED;
     }
     if (period_ms == 0) {
@@ -152,7 +152,7 @@ elib_ts_err_t elib_ts_task_start(elib_ts_ctx_t *ctx, uint32_t task_id) {
     if (ctx == NULL) {
         return ELIB_TS_ERR_INVALID_PARAM;
     }
-    if (!ctx->initialized) {
+    if (!ctx->bit_flags.initialized) {
         return ELIB_TS_ERR_NOT_INITIALIZED;
     }
 
@@ -174,7 +174,7 @@ elib_ts_err_t elib_ts_task_stop(elib_ts_ctx_t *ctx, uint32_t task_id) {
     if (ctx == NULL) {
         return ELIB_TS_ERR_INVALID_PARAM;
     }
-    if (!ctx->initialized) {
+    if (!ctx->bit_flags.initialized) {
         return ELIB_TS_ERR_NOT_INITIALIZED;
     }
 
@@ -196,7 +196,7 @@ elib_ts_err_t elib_ts_task_set_period(elib_ts_ctx_t *ctx, uint32_t task_id,
     if (ctx == NULL) {
         return ELIB_TS_ERR_INVALID_PARAM;
     }
-    if (!ctx->initialized) {
+    if (!ctx->bit_flags.initialized) {
         return ELIB_TS_ERR_NOT_INITIALIZED;
     }
     if (period_ms == 0) {
@@ -221,7 +221,7 @@ elib_ts_err_t elib_ts_task_get_info(elib_ts_ctx_t *ctx, uint32_t task_id,
     if (ctx == NULL || out_info == NULL) {
         return ELIB_TS_ERR_INVALID_PARAM;
     }
-    if (!ctx->initialized) {
+    if (!ctx->bit_flags.initialized) {
         return ELIB_TS_ERR_NOT_INITIALIZED;
     }
 
@@ -243,7 +243,7 @@ elib_ts_err_t elib_ts_poll(elib_ts_ctx_t *ctx) {
     if (ctx == NULL) {
         return ELIB_TS_ERR_INVALID_PARAM;
     }
-    if (!ctx->initialized) {
+    if (!ctx->bit_flags.initialized) {
         return ELIB_TS_ERR_NOT_INITIALIZED;
     }
     if (!ctx->running) {

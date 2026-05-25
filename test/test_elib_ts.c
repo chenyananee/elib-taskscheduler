@@ -51,9 +51,9 @@ static void test_init_valid(void) {
     printf("Test: init valid... ");
     reset_test();
 
-    assert(test_ctx.initialized == 1);
+    assert(test_ctx.bit_flags.initialized == 1);
     assert(test_ctx.max_tasks == MAX_TASKS);
-    assert(test_ctx.running == false);
+    assert(test_ctx.bit_flags.running == 0);
 
     printf("PASSED\n");
 }
@@ -93,7 +93,7 @@ static void test_deinit(void) {
     reset_test();
 
     elib_ts_deinit(&test_ctx);
-    assert(test_ctx.initialized == 0);
+    assert(test_ctx.bit_flags.initialized == 0);
 
     printf("PASSED\n");
 }
@@ -187,11 +187,11 @@ static void test_scheduler_start_stop(void) {
     reset_test();
 
     assert(elib_ts_start(&test_ctx) == ELIB_TS_OK);
-    assert(test_ctx.running == true);
+    assert(test_ctx.bit_flags.running == 1);
     assert(elib_ts_start(&test_ctx) == ELIB_TS_ERR_ALREADY_RUNNING);
 
     assert(elib_ts_stop(&test_ctx) == ELIB_TS_OK);
-    assert(test_ctx.running == false);
+    assert(test_ctx.bit_flags.running == 0);
     assert(elib_ts_stop(&test_ctx) == ELIB_TS_ERR_NOT_RUNNING);
 
     printf("PASSED\n");

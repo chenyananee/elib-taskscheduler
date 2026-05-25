@@ -42,10 +42,12 @@ typedef struct {
 typedef struct {
     elib_ts_task_t *tasks;
     uint32_t max_tasks;
-    bool running;
     void (*enter_critical)(void);
     void (*exit_critical)(void);
-    int initialized;
+    struct {
+        uint8_t running : 1;
+        uint8_t initialized : 1;
+    } bit_flags;
 } elib_ts_ctx_t;
 
 /* Task info (query output) */

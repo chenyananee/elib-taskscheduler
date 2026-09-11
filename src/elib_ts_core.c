@@ -246,7 +246,7 @@ elib_ts_err_t elib_ts_poll(elib_ts_ctx_t *ctx) {
     if (!ctx->bit_flags.initialized) {
         return ELIB_TS_ERR_NOT_INITIALIZED;
     }
-    if (!ctx->running) {
+    if (!ctx->bit_flags.running) {
         return ELIB_TS_OK;
     }
 
@@ -267,6 +267,7 @@ elib_ts_err_t elib_ts_poll(elib_ts_ctx_t *ctx) {
             continue;
 
         case ELIB_TS_TASK_READY:
+        case ELIB_TS_TASK_RUNNING:
             if (task->elapsed_ms < task->period_ms) {
                 continue;
             }
